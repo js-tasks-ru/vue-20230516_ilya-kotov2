@@ -14,7 +14,7 @@
     <div id="app" style="margin-top: 2rem">
       <div class="container">
         <div class="form-group">
-          <input type="search" @input="filterField = $event.target.value" />
+          <input type="search" v-model="filterField" />
         </div>
         <ul>
           <li v-for="email of resultEmails" :class="{marked: email.isSelectClass}">{{ email.email }}</li>

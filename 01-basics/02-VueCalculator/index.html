@@ -31,18 +31,18 @@
     <div id="app" class="container">
       <div class="row">
         <div class="col">
-          <input type="number" @input="firstNumber = $event.target.value"/>
+          <input type="number" v-model="firstNumber"/>
         </div>
 
         <div class="col" style="display: flex; flex-direction: column; font-family: emoji">
-          <label><input type="radio" name="operator" value="sum" @change="mathSign = $event.target.value"/> ➕</label>
-          <label><input type="radio" name="operator" value="subtract" @change="mathSign = $event.target.value"/> ➖</label>
-          <label><input type="radio" name="operator" value="multiply" @change="mathSign = $event.target.value"/> ✖</label>
-          <label><input type="radio" name="operator" value="divide" @change="mathSign = $event.target.value"/> ➗</label>
+          <label><input type="radio" name="operator" value="sum" v-model="mathSign"/> ➕</label>
+          <label><input type="radio" name="operator" value="subtract" v-model="mathSign"/> ➖</label>
+          <label><input type="radio" name="operator" value="multiply" v-model="mathSign"/> ✖</label>
+          <label><input type="radio" name="operator" value="divide" v-model="mathSign"/> ➗</label>
         </div>
 
         <div class="col">
-          <input type="number" @input="secondNumber = $event.target.value"/>
+          <input type="number" v-model="secondNumber"/>
         </div>
 
         <div class="col">=</div>

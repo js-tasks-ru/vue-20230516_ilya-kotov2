@@ -12,7 +12,7 @@
             type="radio" 
             name="meetupId" 
             :value="num" 
-            @change="meetupId = $event.target.value" 
+            v-model="meetupId"
           />
           {{ num }}
         </label>

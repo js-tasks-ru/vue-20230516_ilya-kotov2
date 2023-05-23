@@ -40,16 +40,12 @@ const app = createApp({
 
   computed: {
     resultEmails() {
-      const result = [];
-
-      emails.forEach((el) => {
-        result.push({
+      return emails.map((el) => {
+        return {
           email: el,
           isSelectClass: this.filterField.length ? el.toLowerCase().includes(this.filterField.toLowerCase()) : false,
-        });
+        };
       });
-
-      return result;
     },
   },
 });

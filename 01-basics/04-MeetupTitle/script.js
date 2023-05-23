@@ -15,7 +15,6 @@ function fetchMeetupById(meetupId) {
 }
 
 // Требуется создать Vue приложение
-// Что-то я не понял как сделать это задание правильно((
 
 const app = createApp({
   data() {
