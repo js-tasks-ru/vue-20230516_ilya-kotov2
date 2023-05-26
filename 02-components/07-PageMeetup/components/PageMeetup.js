@@ -35,7 +35,7 @@ export default defineComponent({
 
         fetchMeetupById(this.meetupId)
           .then((results) => (this.result = results))
-          .catch((err) => (this.error = err));
+          .catch((err) => (this.error = err.message));
       },
       immediate: true,
     },
