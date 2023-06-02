@@ -1,18 +1,34 @@
 <template>
-  <div class="dropdown dropdown_opened">
-    <button type="button" class="dropdown__toggle dropdown__toggle_icon">
-      <UiIcon icon="tv" class="dropdown__icon" />
-      <span>Title</span>
+  <div class="dropdown" :class="{'dropdown_opened': isOptionShow}">
+    <button
+      type="button" 
+      class="dropdown__toggle"
+      :class="{'dropdown__toggle_icon': isOneIcon}"
+      @click="isOptionShow = !isOptionShow"
+    >
+      <UiIcon 
+        v-if="newTitle.icon" 
+        :icon="newTitle.icon" 
+        class="dropdown__icon" 
+      />
+      <span>{{ newTitle.text }}</span>
     </button>
 
-    <div class="dropdown__menu" role="listbox">
-      <button class="dropdown__item dropdown__item_icon" role="option" type="button">
-        <UiIcon icon="tv" class="dropdown__icon" />
-        Option 1
-      </button>
-      <button class="dropdown__item dropdown__item_icon" role="option" type="button">
-        <UiIcon icon="tv" class="dropdown__icon" />
-        Option 2
+    <div v-show="isOptionShow" class="dropdown__menu" role="listbox">
+      <button 
+        v-for="option in options" 
+        class="dropdown__item" 
+        :class="{'dropdown__toggle_icon dropdown__item_icon': isOneIcon}"
+        role="option" 
+        type="button"
+        @click="$emit('update:modelValue', option.value), isOptionShow = false"
+        >
+        <UiIcon 
+          v-if="option.icon" 
+          :icon="option.icon" 
+          class="dropdown__icon" 
+        />
+        {{ option.text }}
       </button>
     </div>
   </div>
@@ -25,6 +41,49 @@ export default {
   name: 'UiDropdown',
 
   components: { UiIcon },
+
+  props: {
+    options: {
+      type: Array,
+      required: true,
+    },
+    modelValue: {
+      type: String,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+  },
+
+  emits: [
+    "update:modelValue"
+  ],
+
+  data() {
+    return {
+      isOptionShow: false,
+    }
+  },
+
+  methods: {
+  },
+
+  computed: {
+    newTitle() {
+      if(this.modelValue) {
+        return this.options.find(el => el.value === this.modelValue);
+
+      } else {
+        return {text: this.title, icon: ''};
+      };
+    },
+
+    isOneIcon() {
+      return this.options.some(el => Boolean(el.icon));
+    }
+  },
+
 };
 </script>
 
