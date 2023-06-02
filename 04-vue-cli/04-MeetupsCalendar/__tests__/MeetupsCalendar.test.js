@@ -121,7 +121,6 @@ describe('vue-cli/MeetupsCalendar', () => {
       const wrapper = mountMeetupsCalendar();
       for (let i = 0; i < 9; i++) {
         const nextMonthButton = wrapper.get(SELECTOR_NEXT_MONTH);
-        console.log(wrapper.html());
         await nextMonthButton.trigger('click');
       }
       testMonthCalendar(wrapper, '2021-02-15', [], 28, []);

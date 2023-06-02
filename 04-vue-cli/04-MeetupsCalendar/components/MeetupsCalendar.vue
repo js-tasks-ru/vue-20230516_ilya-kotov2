@@ -69,7 +69,9 @@ export default {
   methods: {
     changeMonth(direction) {
       const currentMonth = this.date.getMonth();
-      this.date = new Date(this.date.setMonth(currentMonth + direction));
+      const currentYear = this.date.getFullYear();
+      
+      this.date = new Date(currentYear, currentMonth + direction, 1);
     },
 
     checkingMeetups(time) {
