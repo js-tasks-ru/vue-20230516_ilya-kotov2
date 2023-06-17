@@ -1,15 +1,112 @@
 <template>
   <div class="image-uploader">
-    <label class="image-uploader__preview image-uploader__preview-loading" style="--bg-url: url('/link.jpeg')">
-      <span class="image-uploader__text">Загрузить изображение</span>
-      <input type="file" accept="image/*" class="image-uploader__input" />
+    <label
+      class="image-uploader__preview"
+      :class="{ 'image-uploader__preview-loading': componentStatus === 'loading' }"
+      :style="{ '--bg-url': `url('${imageLink}')` }"
+      @[eventName].prevent="deleteImg"
+    >
+      <span class="image-uploader__text">{{ downloadStatus }}</span>
+      <input
+        v-bind="$attrs"
+        type="file"
+        accept="image/*"
+        class="image-uploader__input"
+        @change="gettingFile"
+        ref="input"
+      />
     </label>
   </div>
 </template>
 
 <script>
+const statuses = {
+  download: 'Загрузить изображение',
+  loading: 'Загрузка...',
+  remove: 'Удалить изображение',
+};
+
+const linkBasicImg = '/link.jpeg';
+
 export default {
   name: 'UiImageUploader',
+
+  inheritAttrs: false,
+
+  props: {
+    preview: String,
+    uploader: Function,
+  },
+
+  emits: ['select', 'upload', 'error', 'remove'],
+
+  data() {
+    return {
+      imageLink: null,
+      componentStatus: 'download',
+    };
+  },
+
+  methods: {
+    gettingFile(event) {
+      const file = event.target.files[0];
+      const previousStatusLink = this.imageLink;
+      this.imageLink = URL.createObjectURL(file);
+
+      this.$emit('select', file);
+
+      if (this.uploader) {
+        this.uploaderFile(file, previousStatusLink);
+      } else {
+        this.determineState();
+      }
+
+      event.target.value = null;
+    },
+
+    uploaderFile(file, prevLink) {
+      this.componentStatus = 'loading';
+
+      this.uploader(file)
+        .then(
+          (result) => this.$emit('upload', result),
+          (error) => {
+            this.$emit('error', error);
+            this.imageLink = prevLink;
+          },
+        )
+        .finally(this.determineState);
+    },
+
+    determineState() {
+      if (this.imageLink === linkBasicImg) {
+        this.componentStatus = 'download';
+      } else {
+        this.componentStatus = 'remove';
+      }
+    },
+
+    deleteImg() {
+      this.imageLink = linkBasicImg;
+      this.determineState();
+      this.$emit('remove');
+    },
+  },
+
+  computed: {
+    downloadStatus() {
+      return statuses[this.componentStatus];
+    },
+
+    eventName() {
+      return this.componentStatus === 'remove' ? 'click' : null;
+    },
+  },
+
+  created() {
+    this.imageLink = this.preview ? this.preview : linkBasicImg;
+    this.determineState();
+  },
 };
 </script>
 
