@@ -1,13 +1,33 @@
 <template>
-  <div class="input-group input-group_icon input-group_icon-left input-group_icon-right">
-    <div class="input-group__icon">
-      <img class="icon" alt="icon" />
+  <div 
+    class="input-group input-group_icon"
+    :class="{
+      'input-group_icon-left': !!$slots['left-icon'], 
+      'input-group_icon-right': !!$slots['right-icon']
+      }"
+  >
+    <div 
+      v-if="!!$slots['left-icon']"
+      class="input-group__icon"
+    >
+      <slot name="left-icon" />
     </div>
 
-    <input ref="input" class="form-control form-control_rounded form-control_sm" />
+    <component
+      :is="selectTag"
+      ref="input"
+      class="form-control"
+      :class="additionalClass"
+      v-bind="$attrs"
+      :value="modelValue"
+      @[activatLazyModifier]="$emit('update:modelValue', $event.target.value)"
+    />
 
-    <div class="input-group__icon">
-      <img class="icon" alt="icon" />
+    <div 
+      v-if="!!$slots['right-icon']"
+      class="input-group__icon"
+    >
+      <slot name="right-icon" />
     </div>
   </div>
 </template>
@@ -15,6 +35,54 @@
 <script>
 export default {
   name: 'UiInput',
+
+  props: {
+    modelValue: String,
+    modelModifiers: {
+      default: () => ({})
+    },
+    small: Boolean,
+    rounded: Boolean,
+    multiline: Boolean,
+  },
+
+  emits: ['update:modelValue'],
+
+  inheritAttrs: false,
+
+  computed: {
+    selectTag() {
+      return this.multiline ? 'textarea' : 'input';
+    },
+
+    additionalClass() {
+      const result = [];
+
+      if (this.small) result.push('form-control_sm');
+      if (this.rounded) result.push('form-control_rounded');
+
+      return result;
+    },
+
+    activatLazyModifier() {
+      /* 
+      Как лучше сделать Lazy модификатор: в computed создать функцию 
+      или создать переменную и присвоить ей значение при создании 
+      компонента в created. Получается при работе компонента мы не 
+      будем изменять модификатор, поэтому возник вопрос как лучше
+      поступить.
+      */
+      const { lazy } = this.modelModifiers;
+
+      return lazy ? 'change' : 'input';
+    }
+  },
+
+  methods: {
+    focus() {
+      this.$refs.input.focus();
+    },
+  },
 };
 </script>
 

@@ -2,7 +2,8 @@
   <div class="wrapper">
     <MeetupsHeader />
     <main class="main">
-      <div>CURRENT PAGE</div>
+      <!-- <div>CURRENT PAGE</div> -->
+      <router-view />
     </main>
     <MeetupsFooter />
   </div>

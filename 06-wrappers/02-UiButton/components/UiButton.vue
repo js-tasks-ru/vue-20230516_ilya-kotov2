@@ -1,10 +1,55 @@
 <template>
-  <button class="button button_secondary button_block">BUTTON</button>
+  <component 
+    :is="tag" 
+    class="button"
+    :class="additionalClass"
+    :type="typeButton"
+  >
+  <slot />
+  </component>
 </template>
 
 <script>
+
+const matchingClasses = {
+  primary: 'button_primary',
+  secondary: 'button_secondary',
+  danger: 'button_danger',
+  block: 'button_block'
+}
+
 export default {
   name: 'UiButton',
+
+  props: {
+    tag: {
+      type: [String, Object, Function],
+      default: 'button',
+    },
+
+    variant: {
+      type: String,
+      default: 'secondary'
+    },
+
+    block: Boolean,
+  },
+
+  computed: {
+    additionalClass() {
+      const result = [];
+      result.push(matchingClasses[this.variant]);
+
+      if (this.block) result.push(matchingClasses.block);
+
+      return result;
+    },
+
+    typeButton() {
+      return this.tag === 'button' ? 'button' : null;
+    },
+  }
+  
 };
 </script>
 
