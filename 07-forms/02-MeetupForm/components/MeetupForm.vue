@@ -1,5 +1,5 @@
 <template>
-  <form class="meetup-form">
+  <form class="meetup-form" @submit="sendData">
     <div class="meetup-form__content">
       <fieldset class="meetup-form__section">
         <UiFormGroup label="Название">
@@ -29,15 +29,14 @@
       </fieldset>
 
       <h3 class="meetup-form__agenda-title">Программа</h3>
-      
+
       <meetup-agenda-item-form
         v-for="(agendaItem, index) in copyMeetup.agenda"
-         :key="agendaItem.id"
-         v-model:agenda-item="copyMeetup.agenda[index]"
-         @remove="removeAgenda(index)"
-         class="meetup-form__agenda-item"
-       />
-      
+        :key="agendaItem.id"
+        v-model:agenda-item="copyMeetup.agenda[index]"
+        @remove="removeAgenda(index)"
+        class="meetup-form__agenda-item"
+      />
 
       <div class="meetup-form__append">
         <button @click="createAgenda" class="meetup-form__append-button" type="button" data-test="addAgendaItem">
@@ -49,8 +48,21 @@
     <div class="meetup-form__aside">
       <div class="meetup-form__aside-stick">
         <!-- data-test атрибуты используются для поиска нужного элемента в тестах, не удаляйте их -->
-        <ui-button @click="$emit('cancel')" variant="secondary" block class="meetup-form__aside-button" data-test="cancel">Отмена</ui-button>
-        <ui-button @click.prevent="sendData" variant="primary" block class="meetup-form__aside-button" data-test="submit" type="submit">
+        <ui-button
+          @click="$emit('cancel')"
+          variant="secondary"
+          block
+          class="meetup-form__aside-button"
+          data-test="cancel"
+          >Отмена</ui-button
+        >
+        <ui-button
+          variant="primary"
+          block
+          class="meetup-form__aside-button"
+          data-test="submit"
+          type="submit"
+        >
           {{ submitText }}
         </ui-button>
       </div>
@@ -98,7 +110,7 @@ export default {
   data() {
     return {
       copyMeetup: klona(this.meetup),
-    }
+    };
   },
 
   methods: {
@@ -110,7 +122,6 @@ export default {
         newAgenda.startsAt = endTime;
       }
       this.copyMeetup.agenda.push(newAgenda);
-
     },
 
     removeAgenda(index) {
@@ -118,20 +129,10 @@ export default {
     },
 
     sendData() {
-    if (this.copyMeetup.imageToUpload) {
-      this.copyMeetup.image = this.copyMeetup.imageToUpload;
-    };
-    
-    this.$emit('submit', klona(this.copyMeetup));
+      this.$emit('submit', klona(this.copyMeetup));
+    },
   },
-  },
-
-  
-
-
 };
-
-
 </script>
 
 <style scoped>

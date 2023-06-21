@@ -1,42 +1,48 @@
 <template>
   <fieldset class="agenda-item-form">
-    <button type="button" class="agenda-item-form__remove-button">
+    <button type="button" class="agenda-item-form__remove-button" @click="$emit('remove')">
       <UiIcon icon="trash" />
     </button>
 
     <UiFormGroup>
-      <UiDropdown title="Тип" :options="$options.agendaItemTypeOptions" name="type" />
+      <UiDropdown title="Тип" v-model="localAgendaItem.type" :options="$options.agendaItemTypeOptions" name="type" />
     </UiFormGroup>
 
     <div class="agenda-item-form__row">
       <div class="agenda-item-form__col">
         <UiFormGroup label="Начало">
-          <UiInput type="time" placeholder="00:00" name="startsAt" />
+          <UiInput type="time" v-model="localAgendaItem.startsAt" placeholder="00:00" name="startsAt" />
         </UiFormGroup>
       </div>
       <div class="agenda-item-form__col">
         <UiFormGroup label="Окончание">
-          <UiInput type="time" placeholder="00:00" name="endsAt" />
+          <UiInput type="time" v-model="localAgendaItem.endsAt" placeholder="00:00" name="endsAt" />
         </UiFormGroup>
       </div>
     </div>
 
-    <UiFormGroup label="Тема">
-      <UiInput name="title" />
+    <UiFormGroup :label="availableField?.title" v-if="availableField?.title">
+      <UiInput name="title" v-model="localAgendaItem.title" />
     </UiFormGroup>
-    <UiFormGroup label="Докладчик">
-      <UiInput name="speaker" />
+    <UiFormGroup :label="availableField?.speaker" v-if="availableField?.speaker">
+      <UiInput name="speaker" v-model="localAgendaItem.speaker" />
     </UiFormGroup>
-    <UiFormGroup label="Описание">
-      <UiInput multiline name="description" />
+    <UiFormGroup :label="availableField?.description" v-if="availableField?.description">
+      <UiInput multiline name="description" v-model="localAgendaItem.description" />
     </UiFormGroup>
-    <UiFormGroup label="Язык">
-      <UiDropdown title="Язык" :options="$options.talkLanguageOptions" name="language" />
+    <UiFormGroup :label="availableField?.language" v-if="availableField?.language">
+      <UiDropdown
+        title="Язык"
+        v-model="localAgendaItem.language"
+        :options="$options.talkLanguageOptions"
+        name="language"
+      />
     </UiFormGroup>
   </fieldset>
 </template>
 
 <script>
+import { klona } from 'klona';
 import UiIcon from './UiIcon.vue';
 import UiFormGroup from './UiFormGroup.vue';
 import UiInput from './UiInput.vue';
@@ -88,6 +94,76 @@ export default {
     agendaItem: {
       type: Object,
       required: true,
+    },
+  },
+
+  emits: ['remove', 'update:agenda-item'],
+
+  data() {
+    return {
+      localAgendaItem: klona(this.agendaItem),
+      durationAgenda: null,
+    };
+  },
+
+  methods: {
+    convertHoursInMSeconds(time) {
+      const timeMin = time.split(':');
+      return (parseInt(timeMin[0]) * 60 + parseInt(timeMin[1])) * 60 * 1000;
+    },
+  },
+
+  watch: {
+    localAgendaItem: {
+      deep: true,
+      handler() {
+        this.$emit('update:agenda-item', klona(this.localAgendaItem));
+      },
+    },
+
+    'localAgendaItem.startsAt'() {
+      if (this.durationAgenda) {
+        const startTime = this.convertHoursInMSeconds(this.localAgendaItem.startsAt);
+        const newEndTime = new Date(startTime + this.durationAgenda);
+
+        const hours = String(newEndTime.getUTCHours()).padStart(2, '0');
+        const minut = String(newEndTime.getUTCMinutes()).padStart(2, '0');
+
+        this.localAgendaItem.endsAt = `${hours}:${minut}`;
+      }
+    },
+
+    'localAgendaItem.endsAt'() {
+      const endTimeSecnd = this.convertHoursInMSeconds(this.localAgendaItem.endsAt);
+      const startTimeSecnd = this.convertHoursInMSeconds(this.localAgendaItem.startsAt);
+      let endTime = new Date(endTimeSecnd);
+      const startTime = new Date(startTimeSecnd);
+
+      if (endTime < startTime) {
+        endTime = new Date(endTime.getTime() + 24 * 3600 * 1000);
+      }
+
+      this.durationAgenda = endTime - startTime;
+    },
+  },
+
+  computed: {
+    availableField() {
+      const result = {};
+
+      if (this.localAgendaItem.type === 'talk') {
+        result.title = 'Тема';
+        result.speaker = 'Докладчик';
+        result.description = 'Описание';
+        result.language = 'Язык';
+      } else if (this.localAgendaItem.type === 'other') {
+        result.title = 'Заголовок';
+        result.description = 'Описание';
+      } else {
+        result.title = 'Нестандартный текст (необязательно)';
+      }
+
+      return result;
     },
   },
 };
