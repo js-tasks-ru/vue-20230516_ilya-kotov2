@@ -172,12 +172,11 @@ export default {
     },
   },
 
-  emits: ['remove', 'update:agenda-item'],
+  emits: ['remove', 'update:agendaItem'],
 
   data() {
     return {
       localAgendaItem: klona(this.agendaItem),
-      durationAgenda: null,
     };
   },
 
@@ -192,33 +191,22 @@ export default {
     localAgendaItem: {
       deep: true,
       handler() {
-        this.$emit('update:agenda-item', klona(this.localAgendaItem));
+        this.$emit('update:agendaItem', klona(this.localAgendaItem));
       },
     },
 
-    'localAgendaItem.startsAt'() {
-      if (this.durationAgenda) {
-        const startTime = this.convertHoursInMSeconds(this.localAgendaItem.startsAt);
-        const newEndTime = new Date(startTime + this.durationAgenda);
+    'localAgendaItem.startsAt'(newValue, oldValue) {
+      const endTime = this.convertHoursInMSeconds(this.localAgendaItem.endsAt);
+      const startTimeOld = this.convertHoursInMSeconds(oldValue);
+      const startTimeNew = this.convertHoursInMSeconds(newValue);
 
-        const hours = String(newEndTime.getUTCHours()).padStart(2, '0');
-        const minut = String(newEndTime.getUTCMinutes()).padStart(2, '0');
+      const timeDelta = endTime - startTimeOld;
+      const newEndTime = new Date(startTimeNew + timeDelta);
 
-        this.localAgendaItem.endsAt = `${hours}:${minut}`;
-      }
-    },
+      const hours = String(newEndTime.getUTCHours()).padStart(2, '0');
+      const minut = String(newEndTime.getUTCMinutes()).padStart(2, '0');
 
-    'localAgendaItem.endsAt'() {
-      const endTimeSecnd = this.convertHoursInMSeconds(this.localAgendaItem.endsAt);
-      const startTimeSecnd = this.convertHoursInMSeconds(this.localAgendaItem.startsAt);
-      let endTime = new Date(endTimeSecnd);
-      const startTime = new Date(startTimeSecnd);
-
-      if (endTime < startTime) {
-        endTime = new Date(endTime.getTime() + 24 * 3600 * 1000);
-      }
-
-      this.durationAgenda = endTime - startTime;
+      this.localAgendaItem.endsAt = `${hours}:${minut}`;
     },
   },
 
