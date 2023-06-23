@@ -1,11 +1,11 @@
 <template>
-  <main class="mini-messenger">
-    <ul class="messages">
-      <li v-for="message in messages" :key="message.id" class="message">
+  <main class="mini-messenger" >
+    <ul class="messages" ref="target">
+      <li v-for="message in messages" :key="message.id" class="message" >
         {{ message.text }}
       </li>
     </ul>
-    <form @submit.prevent="handleSendSubmit">
+    <form @submit.prevent="handleSendSubmit" >
       <div class="input-group">
         <input v-model="newMessage" type="text" class="form-control messenger__input" placeholder="New message" />
       </div>
@@ -42,7 +42,14 @@ export default {
         text: this.newMessage,
       });
       this.newMessage = '';
+
+      this.$nextTick(this.scrollDown);
     },
+
+    scrollDown() {
+      const lastLi = [...this.$refs.target.children].at(-1);
+      lastLi.scrollIntoView(false);
+    }
   },
 };
 </script>
