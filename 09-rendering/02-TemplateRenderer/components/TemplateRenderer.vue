@@ -1,6 +1,6 @@
 <script>
 import { h } from 'vue';
-import MyComponent from './../createComponent';
+import MyComponent from '../createComponent';
 
 export default {
   name: 'TemplateRenderer',
