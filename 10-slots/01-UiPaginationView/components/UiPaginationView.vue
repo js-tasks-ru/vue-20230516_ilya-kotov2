@@ -1,6 +1,11 @@
 <template>
   <div class="pagination-container">
-    <!-- Контент страницы -->
+    <ul>
+      <li v-for="onePage in currentPages" :key="onePage.id">
+        {{ onePage.id }}
+        <slot :item="onePage" />
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -24,6 +29,15 @@ export default {
     items: {
       type: Array,
       required: true,
+    },
+  },
+
+  computed: {
+    currentPages() {
+      const indexFirstMeetap = (this.page - 1) * this.perPage;
+      const indexLastMeetap = indexFirstMeetap + this.perPage;
+
+      return this.items.slice(indexFirstMeetap, indexLastMeetap);
     },
   },
 };
