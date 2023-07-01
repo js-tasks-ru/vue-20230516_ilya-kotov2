@@ -2,6 +2,7 @@
   <div class="pagination-container">
     <ul>
       <li v-for="onePage in currentPages" :key="onePage.id">
+        {{ onePage.id }}
         <slot :item="onePage" />
       </li>
     </ul>
@@ -33,7 +34,10 @@ export default {
 
   computed: {
     currentPages() {
-      return this.items.slice(this.page, this.page + this.perPage);
+      const indexFirstMeetap = (this.page - 1) * this.perPage;
+      const indexLastMeetap = indexFirstMeetap + this.perPage;
+
+      return this.items.slice(indexFirstMeetap, indexLastMeetap);
     },
   },
 };
